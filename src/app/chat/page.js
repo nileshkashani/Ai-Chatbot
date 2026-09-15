@@ -311,7 +311,7 @@ export default function ChatPage() {
               </div>
               <h2 className="chat-empty__title">How can I help you today?</h2>
               <p className="chat-empty__subtitle">
-                Start a conversation with Gemini AI. Ask questions, generate code, analyze data, and more.
+                Start a conversation with Bluu AI. Ask questions, generate code, analyze data, and more.
               </p>
               <div className="chat-empty__suggestions">
                 {[
@@ -343,7 +343,7 @@ export default function ChatPage() {
                     </svg>
                   </div>
                   <div className="chat-message__body">
-                    <div className="chat-message__role">Gemini AI</div>
+                    <div className="chat-message__role">Bluu AI</div>
                     <div className="chat-message__typing">
                       <span className="chat-message__typing-dot" />
                       <span className="chat-message__typing-dot" />

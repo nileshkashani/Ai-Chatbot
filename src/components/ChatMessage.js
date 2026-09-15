@@ -26,7 +26,7 @@ export default function ChatMessage({ message }) {
       {/* Message body */}
       <div className="chat-message__body">
         <div className="chat-message__role">
-          {isUser ? "You" : "Gemini AI"}
+          {isUser ? "You" : "Bluu AI"}
         </div>
         <div className="chat-message__content">
           {isUser ? (
