@@ -5,15 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signIn, signUp, user, loading: authLoading } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   // Redirect if already logged in
@@ -36,40 +33,24 @@ export default function LoginPage() {
       setError("Password is required.");
       return false;
     }
-    if (isSignUp && password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return false;
-    }
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
 
     if (!validateForm()) return;
 
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        await signUp(email, password);
-        setSuccess("Account created! Check your email for verification, or sign in if email confirmation is disabled.");
-        setIsSignUp(false);
-        setPassword("");
-        setConfirmPassword("");
-      } else {
-        await signIn(email, password);
-        router.push("/chat");
-      }
+      await signIn(email, password);
+      router.push("/chat");
     } catch (err) {
       const message = err?.message || "An unexpected error occurred.";
-      // Provide user-friendly error messages
       if (message.includes("Invalid login credentials")) {
         setError("Invalid email or password. Please try again.");
-      } else if (message.includes("User already registered")) {
-        setError("An account with this email already exists. Try signing in.");
       } else if (message.includes("Email not confirmed")) {
         setError("Please confirm your email before signing in.");
       } else if (message.includes("rate limit")) {
@@ -109,15 +90,13 @@ export default function LoginPage() {
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
             </svg>
           </div>
-          <h1 className="login-card__title">Gemini Chat</h1>
+          <h1 className="login-card__title">Bluu AI</h1>
           <p className="login-card__subtitle">
-            {isSignUp
-              ? "Create your account to get started"
-              : "Sign in to continue your conversations"}
+            Sign in to continue your conversations
           </p>
         </div>
 
-        {/* Error / Success messages */}
+        {/* Error message */}
         {error && (
           <div className="login-card__alert login-card__alert--error">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -126,15 +105,6 @@ export default function LoginPage() {
               <line x1="9" y1="9" x2="15" y2="15" />
             </svg>
             {error}
-          </div>
-        )}
-        {success && (
-          <div className="login-card__alert login-card__alert--success">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-              <polyline points="22 4 12 14.01 9 11.01" />
-            </svg>
-            {success}
           </div>
         )}
 
@@ -163,28 +133,10 @@ export default function LoginPage() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoComplete={isSignUp ? "new-password" : "current-password"}
+              autoComplete="current-password"
               disabled={loading}
             />
           </div>
-
-          {isSignUp && (
-            <div className="login-card__field">
-              <label htmlFor="login-confirm-password" className="login-card__label">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                id="login-confirm-password"
-                className="login-card__input"
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                disabled={loading}
-              />
-            </div>
-          )}
 
           <button
             type="submit"
@@ -194,30 +146,11 @@ export default function LoginPage() {
           >
             {loading ? (
               <div className="login-card__submit-spinner" />
-            ) : isSignUp ? (
-              "Create Account"
             ) : (
               "Sign In"
             )}
           </button>
         </form>
-
-        {/* Toggle */}
-        <div className="login-card__toggle">
-          {isSignUp ? "Already have an account?" : "Don't have an account?"}
-          <button
-            type="button"
-            className="login-card__toggle-btn"
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setError("");
-              setSuccess("");
-            }}
-            disabled={loading}
-          >
-            {isSignUp ? "Sign In" : "Sign Up"}
-          </button>
-        </div>
       </div>
     </div>
   );
