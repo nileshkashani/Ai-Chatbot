@@ -44,7 +44,7 @@ export default function ChatInput({ onSend, isLoading }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Message Gemini AI..."
+          placeholder="Message Bluu AI..."
           rows={1}
           disabled={isLoading}
           id="chat-input-textarea"
