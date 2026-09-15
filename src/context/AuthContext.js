@@ -11,14 +11,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
     getSupabase().auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for auth state changes
     const {
       data: { subscription },
     } = getSupabase().auth.onAuthStateChange((_event, newSession) => {
@@ -30,7 +28,6 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Sign up with email and password
   const signUp = async (email, password) => {
     const { data, error } = await getSupabase().auth.signUp({
       email,
@@ -40,7 +37,6 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  // Sign in with email and password
   const signIn = async (email, password) => {
     const { data, error } = await getSupabase().auth.signInWithPassword({
       email,
@@ -50,13 +46,11 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  // Sign out
   const signOut = async () => {
     const { error } = await getSupabase().auth.signOut();
     if (error) throw error;
   };
 
-  // Get the current access token for API calls
   const getAccessToken = () => {
     return session?.access_token ?? null;
   };

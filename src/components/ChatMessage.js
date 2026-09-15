@@ -9,7 +9,6 @@ export default function ChatMessage({ message }) {
 
   return (
     <div className={`chat-message ${isUser ? "chat-message--user" : "chat-message--ai"}`}>
-      {/* Avatar */}
       <div className={`chat-message__avatar ${isUser ? "chat-message__avatar--user" : "chat-message__avatar--ai"}`}>
         {isUser ? (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -23,7 +22,6 @@ export default function ChatMessage({ message }) {
         )}
       </div>
 
-      {/* Message body */}
       <div className="chat-message__body">
         <div className="chat-message__role">
           {isUser ? "You" : "Bluu AI"}
@@ -68,7 +66,6 @@ export default function ChatMessage({ message }) {
   );
 }
 
-// Code block with copy button
 function CodeBlock({ language, code }) {
   const [copied, setCopied] = useState(false);
 
@@ -78,7 +75,6 @@ function CodeBlock({ language, code }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback
       const textarea = document.createElement("textarea");
       textarea.value = code;
       document.body.appendChild(textarea);

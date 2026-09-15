@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 
-// Helper: Extract auth token
 function getAuthToken(request) {
   const authHeader = request.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -10,7 +9,6 @@ function getAuthToken(request) {
   return authHeader.replace("Bearer ", "");
 }
 
-// GET /api/chat/conversations — List all conversations for the user
 export async function GET(request) {
   try {
     const token = getAuthToken(request);

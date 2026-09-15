@@ -4,7 +4,6 @@ import { createServerSupabase } from "@/lib/supabase";
 
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Helper: Extract and validate auth token from request
 function getAuthToken(request) {
   const authHeader = request.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -13,7 +12,6 @@ function getAuthToken(request) {
   return authHeader.replace("Bearer ", "");
 }
 
-// Helper: Generate a short title from the first user message
 async function generateTitle(message) {
   try {
     const response = await genAI.models.generateContent({
@@ -22,14 +20,12 @@ async function generateTitle(message) {
     });
     return response.text?.trim() || "New Chat";
   } catch {
-    // Fallback: truncate the message
     return message.slice(0, 40) + (message.length > 40 ? "..." : "");
   }
 }
 
 export async function POST(request) {
   try {
-    // 1. Auth check
     const token = getAuthToken(request);
     if (!token) {
       return NextResponse.json(
@@ -40,7 +36,6 @@ export async function POST(request) {
 
     const supabase = createServerSupabase(token);
 
-    // Verify user from token
     const {
       data: { user },
       error: userError,
@@ -53,7 +48,6 @@ export async function POST(request) {
       );
     }
 
-    // 2. Parse and validate request body
     let body;
     try {
       body = await request.json();
@@ -80,11 +74,9 @@ export async function POST(request) {
       );
     }
 
-    // 3. Create or get conversation
     let activeConversationId = conversationId;
 
     if (!activeConversationId) {
-      // Create a new conversation
       const title = await generateTitle(message);
 
       const { data: newConversation, error: createError } = await supabase
@@ -103,7 +95,6 @@ export async function POST(request) {
 
       activeConversationId = newConversation.id;
     } else {
-      // Verify the conversation exists and belongs to the user
       const { data: existingConversation, error: fetchError } = await supabase
         .from("conversations")
         .select("id")
@@ -118,7 +109,6 @@ export async function POST(request) {
       }
     }
 
-    // 4. Save the user's message
     const { error: saveUserMsgError } = await supabase.from("messages").insert({
       conversation_id: activeConversationId,
       role: "user",
@@ -133,13 +123,11 @@ export async function POST(request) {
       );
     }
 
-    // 5. Build conversation history for Gemini
     const geminiHistory = (history || []).map((msg) => ({
       role: msg.role === "user" ? "user" : "model",
       parts: [{ text: msg.content }],
     }));
 
-    // 6. Call Gemini API with retry logic
     let aiResponseText = "";
     let retries = 0;
     const maxRetries = 3;
@@ -157,7 +145,7 @@ export async function POST(request) {
 
         const response = await chat.sendMessage({ message: message.trim() });
         aiResponseText = response.text || "I'm sorry, I couldn't generate a response.";
-        break; // Success — exit retry loop
+        break; 
       } catch (geminiError) {
         retries++;
         const status = geminiError?.status || geminiError?.httpStatusCode;
@@ -173,7 +161,6 @@ export async function POST(request) {
               { status: 503 }
             );
           }
-          // Exponential backoff
           await new Promise((resolve) =>
             setTimeout(resolve, Math.pow(2, retries) * 1000)
           );
@@ -191,7 +178,6 @@ export async function POST(request) {
       }
     }
 
-    // 7. Save the AI response
     const { error: saveAiMsgError } = await supabase.from("messages").insert({
       conversation_id: activeConversationId,
       role: "model",
@@ -200,16 +186,13 @@ export async function POST(request) {
 
     if (saveAiMsgError) {
       console.error("Error saving AI message:", saveAiMsgError);
-      // Still return the response even if saving fails
     }
 
-    // 8. Update conversation's updated_at timestamp
     await supabase
       .from("conversations")
       .update({ updated_at: new Date().toISOString() })
       .eq("id", activeConversationId);
 
-    // 9. Return the response
     return NextResponse.json({
       conversationId: activeConversationId,
       message: {

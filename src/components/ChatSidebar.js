@@ -21,13 +21,10 @@ export default function ChatSidebar({
   const handleDelete = async (e, id) => {
     e.stopPropagation();
     if (deletingId === id) {
-      // Second click — confirm delete
       await onDeleteConversation(id);
       setDeletingId(null);
     } else {
-      // First click — show confirmation
       setDeletingId(id);
-      // Auto-reset after 3s
       setTimeout(() => setDeletingId(null), 3000);
     }
   };
@@ -46,13 +43,11 @@ export default function ChatSidebar({
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div className="sidebar-overlay" onClick={onToggle} />
       )}
 
       <aside className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
-        {/* Sidebar header */}
         <div className="sidebar__header">
           <button className="sidebar__new-chat" onClick={onNewChat}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -69,7 +64,6 @@ export default function ChatSidebar({
           </button>
         </div>
 
-        {/* Search */}
         <div className="sidebar__search">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
@@ -84,7 +78,6 @@ export default function ChatSidebar({
           />
         </div>
 
-        {/* Conversation list */}
         <nav className="sidebar__list">
           {filteredConversations.length === 0 ? (
             <div className="sidebar__empty">

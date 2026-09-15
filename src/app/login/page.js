@@ -13,7 +13,6 @@ export default function LoginPage() {
   const { signIn, user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && user) {
       router.push("/chat");
@@ -75,7 +74,6 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      {/* Animated background shapes */}
       <div className="login-bg">
         <div className="login-bg__shape login-bg__shape--1" />
         <div className="login-bg__shape login-bg__shape--2" />
@@ -83,7 +81,6 @@ export default function LoginPage() {
       </div>
 
       <div className="login-card">
-        {/* Logo */}
         <div className="login-card__logo">
           <div className="login-card__logo-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -96,7 +93,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Error message */}
         {error && (
           <div className="login-card__alert login-card__alert--error">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -108,7 +104,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Form */}
         <form className="login-card__form" onSubmit={handleSubmit}>
           <div className="login-card__field">
             <label htmlFor="login-email" className="login-card__label">Email</label>

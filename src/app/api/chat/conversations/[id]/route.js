@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 
-// Helper: Extract auth token
 function getAuthToken(request) {
   const authHeader = request.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -10,7 +9,6 @@ function getAuthToken(request) {
   return authHeader.replace("Bearer ", "");
 }
 
-// GET /api/chat/conversations/[id] — Get a single conversation with all messages
 export async function GET(request, { params }) {
   try {
     const token = getAuthToken(request);
@@ -37,7 +35,6 @@ export async function GET(request, { params }) {
 
     const { id } = await params;
 
-    // Fetch conversation
     const { data: conversation, error: convError } = await supabase
       .from("conversations")
       .select("id, title, created_at, updated_at")
@@ -51,7 +48,6 @@ export async function GET(request, { params }) {
       );
     }
 
-    // Fetch messages
     const { data: messages, error: msgError } = await supabase
       .from("messages")
       .select("id, role, content, created_at")
@@ -81,7 +77,6 @@ export async function GET(request, { params }) {
   }
 }
 
-// DELETE /api/chat/conversations/[id] — Delete a conversation and its messages
 export async function DELETE(request, { params }) {
   try {
     const token = getAuthToken(request);
@@ -108,7 +103,6 @@ export async function DELETE(request, { params }) {
 
     const { id } = await params;
 
-    // Delete conversation (messages are cascade-deleted)
     const { error: deleteError } = await supabase
       .from("conversations")
       .delete()

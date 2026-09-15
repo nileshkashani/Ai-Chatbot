@@ -6,7 +6,7 @@ export default function ChatInput({ onSend, isLoading }) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef(null);
 
-  // Auto-resize textarea
+ 
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -22,7 +22,7 @@ export default function ChatInput({ onSend, isLoading }) {
     onSend(message.trim());
     setMessage("");
 
-    // Reset textarea height
+
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }

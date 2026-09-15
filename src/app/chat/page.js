@@ -20,14 +20,12 @@ export default function ChatPage() {
   const { user, loading: authLoading, signOut, getAccessToken } = useAuth();
   const router = useRouter();
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login");
     }
   }, [user, authLoading, router]);
 
-  // Scroll to bottom of messages
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
@@ -36,7 +34,6 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Fetch conversations list
   const fetchConversations = useCallback(async () => {
     const token = getAccessToken();
     if (!token) return;
@@ -70,7 +67,6 @@ export default function ChatPage() {
     }
   }, [user, fetchConversations]);
 
-  // Load a conversation's messages
   const loadConversation = useCallback(
     async (conversationId) => {
       const token = getAccessToken();
@@ -104,7 +100,6 @@ export default function ChatPage() {
     [getAccessToken, router]
   );
 
-  // Start a new chat
   const handleNewChat = () => {
     setActiveConversationId(null);
     setMessages([]);
@@ -112,7 +107,6 @@ export default function ChatPage() {
     setIsSidebarOpen(false);
   };
 
-  // Delete a conversation
   const handleDeleteConversation = async (conversationId) => {
     const token = getAccessToken();
     if (!token) return;
@@ -137,14 +131,12 @@ export default function ChatPage() {
     }
   };
 
-  // Send a message
   const handleSendMessage = async (messageText) => {
     if (isLoading) return;
 
     setError("");
     setIsLoading(true);
 
-    // Optimistically add user message
     const userMessage = {
       id: `temp-${Date.now()}`,
       role: "user",
@@ -188,14 +180,11 @@ export default function ChatPage() {
 
       const data = await res.json();
 
-      // Update conversation ID if this was a new conversation
       if (!activeConversationId && data.conversationId) {
         setActiveConversationId(data.conversationId);
-        // Refresh conversations list to show the new one
         fetchConversations();
       }
 
-      // Add AI response
       setMessages((prev) => [
         ...prev,
         {
@@ -208,14 +197,12 @@ export default function ChatPage() {
     } catch (err) {
       console.error("Error sending message:", err);
       setError(err.message || "Failed to send message. Please try again.");
-      // Remove the optimistically added user message on error
       setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle sign out
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -226,7 +213,6 @@ export default function ChatPage() {
     }
   };
 
-  // Auth loading state
   if (authLoading) {
     return (
       <div className="chat-page__loader">
@@ -240,7 +226,6 @@ export default function ChatPage() {
 
   return (
     <div className="chat-page">
-      {/* Sidebar */}
       <ChatSidebar
         conversations={conversations}
         activeConversationId={activeConversationId}
@@ -251,9 +236,7 @@ export default function ChatPage() {
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
-      {/* Main chat area */}
       <main className="chat-main">
-        {/* Header */}
         <header className="chat-header">
           <div className="chat-header__left">
             <button
@@ -271,7 +254,7 @@ export default function ChatPage() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
-              Gemini Chat
+              Bluu AI
             </div>
           </div>
           <div className="chat-header__right">
@@ -282,7 +265,6 @@ export default function ChatPage() {
           </div>
         </header>
 
-        {/* Error banner */}
         {error && (
           <div className="chat-error">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -300,7 +282,6 @@ export default function ChatPage() {
           </div>
         )}
 
-        {/* Messages area */}
         <div className="chat-messages">
           {messages.length === 0 && !isLoading ? (
             <div className="chat-empty">
@@ -357,7 +338,6 @@ export default function ChatPage() {
           )}
         </div>
 
-        {/* Input bar */}
         <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
       </main>
     </div>
